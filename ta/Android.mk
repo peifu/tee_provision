@@ -1,6 +1,7 @@
 LOCAL_PATH:= $(call my-dir)
-TDK_PATH:=../../../
-TA_BINARY=83186819-896e-42cc-aee917a269ddac0b
+TDK_PATH:=../../tdk
+#TA_BINARY=83186819-896e-42cc-aee917a269ddac0b
+TA_BINARY=f4bf8778-ca15-3210-a186f18de88fd39d
 TA_CROSS_COMPILE=arm-linux-gnueabihf-
 TA_EXPORT_DIR := out/target/product/$(TARGET_BOOTLOADER_BOARD_NAME)/system/lib/teetz
 

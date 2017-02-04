@@ -1,6 +1,6 @@
 LOCAL_PATH := $(call my-dir)
 
-CFG_TEEC_PUBLIC_PATH = $(LOCAL_PATH)/../../../ca_export_$(TARGET_ARCH)
+CFG_TEEC_PUBLIC_PATH = $(LOCAL_PATH)/../../tdk/ca_export_$(TARGET_ARCH)
 
 ################################################################################
 # Build provision                                                              #

@@ -28,28 +28,24 @@
 #define TA_PROVISION_H
 
 /* This UUID is generated with Linux uuidgen */
+#define TA_PROVISION_UUID { 0xf4bf8778, 0xca15, 0x3210, \
+	{ 0xa1, 0x86, 0xf1, 0x8d, 0xe8, 0x8f, 0xd3, 0x9d } }
+#if 0
 #define TA_PROVISION_UUID { 0x83186819, 0x896e, 0x42cc, \
-		{ 0xae, 0xe9, 0x17, 0xa2, 0x69, 0xdd, 0xac, 0x0b} }
+	{ 0xae, 0xe9, 0x17, 0xa2, 0x69, 0xdd, 0xac, 0x0b } }
+#endif
 
 /* The TAFs ID implemented in this TA */
-#define TA_PROVISION_CMD_TEST 0
+#define TA_PROVISION_CMD_STORE_WVKEY 1
+#define TA_PROVISION_CMD_STORE_PRKEY 2
 
 /* Hello world TA UUID */
 #define TA_HELLO_WORLD_UUID { 0x8aaaf200, 0x2450, 0x11e4, \
 		{ 0xab, 0xe2, 0x00, 0x02, 0xa5, 0xd5, 0xc5, 0x1b} }
 
-#define TA_WVCENC_UUID { 0xe043cde0, 0x61d0, 0x11e5, \
-		{ 0x9c, 0x26, 0x00, 0x02, 0xa5, 0xd5, 0xc5, 0x1b} }
-
 /* The TAFs ID implemented in Hello world TA */
 #define TA_HELLO_WORLD_CMD_INC_VALUE	0
 #define TA_HELLO_WORLD_CMD_WRITE_KEY	1
 #define TA_HELLO_WORLD_CMD_READ_KEY		2
-
-
-/* The TAFs ID implemented in Widevine TA */
-#define TA_WVCENC_CMD_INITIALIZE
-#define  TA_WVCENC_CMD_PRIVATE                              64
-#define  TA_WVCENC_CMD_PROVISION_STORE_KEY                  TA_WVCENC_CMD_PRIVATE + 4
 
 #endif
