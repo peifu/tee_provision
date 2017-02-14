@@ -36,6 +36,9 @@
 /* store widevine keybox */
 #define TA_WIDEVINE_SUBCMD_STORE_KEYBOX               0x1
 
+#define TA_WIDEVINE_CMD_QUERY_KEY                     0x45
+/* query widevine keybox */
+#define TA_WIDEVINE_SUBCMD_QUERY_KEYBOX               0x1
 
 /* PlayReady TA UUID */
 #define TA_PLAYREADY_UUID { 0x9a04f079, 0x9840, 0x4286, \
@@ -47,5 +50,11 @@
 #define TA_PLAYREADY_SUBCMD_STORE_MODEL_PUBLIC_KEY    0x1
 /* store playready model private key */
 #define TA_PLAYREADY_SUBCMD_STORE_MODEL_PRIVATE_KEY   0x2
+
+#define TA_PLAYREADY_CMD_QUERY_KEY                    0x20
+/* query playready model public key */
+#define TA_PLAYREADY_SUBCMD_QUERY_MODEL_PUBLIC_KEY    0x1
+/* query playready model private key */
+#define TA_PLAYREADY_SUBCMD_QUERY_MODEL_PRIVATE_KEY   0x2
 
 #endif

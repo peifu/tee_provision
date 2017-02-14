@@ -92,8 +92,8 @@ static TEE_Result provision_dump_prop(void)
 {
 	TEE_Result res;
 	TEE_PropSetHandle h;
-	TEE_UUID uuid;
-	TEE_UUID device_uuid;
+	TEE_UUID uuid = {0};
+	TEE_UUID device_uuid = {0};
 	TEE_Identity id;
 	const char *device_id = "gpd.tee.deviceID";
 	const char *uuid_name = "gpd.ta.appID";
@@ -111,15 +111,21 @@ static TEE_Result provision_dump_prop(void)
 	}
 	IMSG("@@1. TEE_PROPSET_TEE_IMPLEMENTATION\n");
 	TEE_StartPropertyEnumerator(h, TEE_PROPSET_TEE_IMPLEMENTATION);
+	res = TEE_GetPropertyAsUUID(h, (void *)device_id, &device_uuid);
+	IMSG("\n*** Device ID : %pUl\n\n", (void *)&device_uuid);
+	res = TEE_SUCCESS;
 	while (res == TEE_SUCCESS) {
 		namebuflen = 64;
 		res = TEE_GetPropertyName(h, (void *)namebuf, &namebuflen);
 		IMSG(" %02d %s(%d)\n", count++, namebuf, namebuflen);
+		if (strcmp(device_id, namebuf) == 0) {
+			res = TEE_GetPropertyAsUUID(h, NULL, &device_uuid);
+			if (res == TEE_SUCCESS) {
+				IMSG("\n*** Device ID : %pUl\n\n", (void *)&device_uuid);
+			}
+		}
 		res = TEE_GetNextProperty(h);
 	}
-
-	res = TEE_GetPropertyAsUUID(h, (void *)device_id, &device_uuid);
-	IMSG("\n********* Device ID : %pUl\n\n", (void *)&device_uuid);
 
 	IMSG("@@2. TEE_PROPSET_CURRENT_CLIENT\n");
 	TEE_StartPropertyEnumerator(h, TEE_PROPSET_CURRENT_CLIENT);
@@ -141,6 +147,8 @@ static TEE_Result provision_dump_prop(void)
 
 	IMSG("@@3. TEE_PROPSET_CURRENT_TA\n");
 	TEE_StartPropertyEnumerator(h, TEE_PROPSET_CURRENT_TA);
+	res = TEE_GetPropertyAsUUID(h, (void *)uuid_name, &uuid);
+	IMSG("  TA uuid  %pUl\n", (void *)&uuid);
 	count = 1;
 	res = TEE_SUCCESS;
 	while (res == TEE_SUCCESS) {
@@ -177,17 +185,35 @@ static TEE_Result provision_ipc_widevine(uint32_t subcmd, uint8_t *buf, uint32_t
 		return TEE_ERROR_ACCESS_DENIED;
 	}
 
+	/* qurey key */
+	l_pts = TEE_PARAM_TYPES(TEE_PARAM_TYPE_VALUE_INPUT,
+					TEE_PARAM_TYPE_NONE,
+					TEE_PARAM_TYPE_NONE,
+					TEE_PARAM_TYPE_NONE);
+	l_params[0].value.a = subcmd;
+	res = TEE_InvokeTACommand(sess, 0, TA_WIDEVINE_CMD_QUERY_KEY,
+								  l_pts, l_params, &ret_orig);
+	if (res != TEE_SUCCESS) {
+		EMSG("[Provision TA] WV query key failed res %x\n", res);
+	} else {
+		EMSG("[Provision TA] WV query key okay\n");
+	}
+
+	/* store key */
 	l_pts = TEE_PARAM_TYPES(TEE_PARAM_TYPE_VALUE_INPUT,
 					TEE_PARAM_TYPE_MEMREF_INPUT,
 					TEE_PARAM_TYPE_NONE,
 					TEE_PARAM_TYPE_NONE);
+	memset(l_params, 0, sizeof(l_params));
 	l_params[0].value.a = subcmd;
 	l_params[1].memref.buffer = buf;
 	l_params[1].memref.size = buflen;
 	res = TEE_InvokeTACommand(sess, 0, TA_WIDEVINE_CMD_STORE_KEY,
 								  l_pts, l_params, &ret_orig);
 	if (res != TEE_SUCCESS) {
-		EMSG("WV TEE_InvokeTACommand failed res %x\n", res);
+		EMSG("[Provision TA] WV store key failed res %x\n", res);
+	} else {
+		EMSG("[Provision TA] WV store key okay\n");
 	}
 
 	TEE_CloseTASession(sess);
@@ -209,17 +235,35 @@ static TEE_Result provision_ipc_playready(uint32_t subcmd, uint8_t *buf, uint32_
 		return TEE_ERROR_ACCESS_DENIED;
 	}
 
+	/* qurey key */
+	l_pts = TEE_PARAM_TYPES(TEE_PARAM_TYPE_VALUE_INPUT,
+					TEE_PARAM_TYPE_NONE,
+					TEE_PARAM_TYPE_NONE,
+					TEE_PARAM_TYPE_NONE);
+	l_params[0].value.a = subcmd;
+	res = TEE_InvokeTACommand(sess, 0, TA_PLAYREADY_CMD_QUERY_KEY,
+								  l_pts, l_params, &ret_orig);
+	if (res != TEE_SUCCESS) {
+		EMSG("[Provision TA] PR query key failed res %x\n", res);
+	} else {
+		EMSG("[Provision TA] PR query key okay\n");
+	}
+
+	/* store key */
 	l_pts = TEE_PARAM_TYPES(TEE_PARAM_TYPE_VALUE_INPUT,
 					TEE_PARAM_TYPE_MEMREF_INPUT,
 					TEE_PARAM_TYPE_NONE,
 					TEE_PARAM_TYPE_NONE);
+	memset(l_params, 0, sizeof(l_params));
 	l_params[0].value.a = subcmd;
 	l_params[1].memref.buffer = buf;
 	l_params[1].memref.size = buflen;
 	res = TEE_InvokeTACommand(sess, 0, TA_PLAYREADY_CMD_STORE_KEY,
 								  l_pts, l_params, &ret_orig);
 	if (res != TEE_SUCCESS) {
-		EMSG("PR TEE_InvokeTACommand failed res %x\n", res);
+		EMSG("[Provision TA] PR store key failed res %x\n", res);
+	} else {
+		EMSG("[Provision TA] PR store key okay\n");
 	}
 
 	TEE_CloseTASession(sess);
